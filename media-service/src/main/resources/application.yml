@@ -1,0 +1,30 @@
+
+server:
+  port: 9040
+spring:
+  application:
+    name: media-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        use_sql_comments: true
+        format_sql: true
+        highlight_sql: true
+  servlet:
+    multipart:
+      max-request-size: 1024MB
+      max-file-size: 250MB
+
+springdoc:
+  api-docs:
+    path: /media-service/v3/api-docs
+  swagger-ui:
+    path: /media-service/swagger-ui.html

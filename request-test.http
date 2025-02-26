@@ -1,0 +1,452 @@
+
+###
+GET http://localhost:8765/authorities
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/authorities/by-id?authorityId=1
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/authorities/by-name?name=ROLE_EMPLOYEE
+Authorization: Basic admin admin
+
+###
+POST http://localhost:8765/authorities/create
+Content-Type: application/json
+Authorization: Basic admin admin
+
+{
+  "name": "ROLE_MODERATOR"
+}
+
+###
+PUT http://localhost:8765/authorities/update
+Content-Type: application/json
+Authorization: Basic admin admin
+
+{
+  "id": 4,
+  "name": "ROLE_MODERATOR_ADMIN"
+}
+
+###
+DELETE http://localhost:8765/authorities/delete?authorityId=4
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/identities
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/identities/by-id?identityId=1
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/identities/by-email?email=employee@gmail.com
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/identities/by-username?username=user
+Authorization: Basic admin admin
+
+###
+POST http://localhost:8765/identities/create
+Content-Type: application/json
+
+{
+  "username": "qweasd",
+  "password": "qweasd",
+  "email": "qweasd@gmail.com",
+  "authorityId": 2
+}
+
+###
+PUT http://localhost:8765/identities/update
+Content-Type: application/json
+Authorization: Basic qweasd qweasd
+
+{
+  "id": 4,
+  "username": "qweasdEDITED",
+  "password": "qweasdEDITED"
+}
+
+###
+DELETE http://localhost:8765/identities/delete?identityId=4
+Authorization: Basic qweasdEDITED qweasdEDITED
+
+###
+PUT http://localhost:8765/identities/banned?identityId=3
+Authorization: Basic admin admin
+
+###
+PUT http://localhost:8765/identities/unbanned?identityId=3
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/addresses
+
+###
+GET http://localhost:8765/addresses/by-id?addressId=1
+
+###
+POST http://localhost:8765/addresses/create
+Content-Type: application/json
+Authorization: Basic admin admin
+
+{
+  "city": "Мурманск",
+  "street": "Урженская",
+  "house": "12",
+  "apartment": "54"
+}
+
+###
+PUT http://localhost:8765/addresses/update
+Content-Type: application/json
+Authorization: Basic admin admin
+
+{
+  "id": 4,
+  "city": "Томск",
+  "street": "Калужская"
+}
+
+###
+DELETE http://localhost:8765/addresses/delete?addressId=4
+
+###
+GET http://localhost:8765/departments
+
+###
+GET http://localhost:8765/departments/by-id?departmentId=1
+
+###
+POST http://localhost:8765/departments/create
+Content-Type: application/json
+Authorization: Basic admin admin
+
+{
+  "addressId": 4,
+  "opensAt": "07:30",
+  "closesAt": "19:00",
+  "opened": false
+}
+
+###
+PUT http://localhost:8765/departments/update
+Content-Type: application/json
+Authorization: Basic admin admin
+
+{
+  "id": 4,
+  "opensAt": "08:00",
+  "closesAt": "20:00"
+}
+
+###
+DELETE http://localhost:8765/departments/delete?departmentId=4
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/employees
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/employees/by-id?employeeId=1
+Authorization: Basic admin admin
+
+###
+POST http://localhost:8765/employees/create
+Content-Type: application/json
+Authorization: Basic qweasd qweasd
+
+{
+  "firstname": "Евгений",
+  "lastname": "Кирьянов",
+  "patronymic": "Олегович",
+  "departmentId": 3,
+  "identityId": 4
+}
+
+###
+PUT http://localhost:8765/employees/update
+Content-Type: application/json
+Authorization: Basic qweasd qweasd
+
+{
+  "id": 2,
+  "firstname": "ЕвгенийEDITED",
+  "lastname": "КирьяновEDITED",
+  "patronymic": "ОлеговичEDITED",
+  "departmentId": 2,
+  "identityId": 4
+}
+
+###
+DELETE http://localhost:8765/employees/delete?employeeId=2
+Authorization: Basic qweasd qweasd
+
+###
+GET http://localhost:8765/categories
+
+###
+GET http://localhost:8765/categories/by-id?categoryId=1
+
+###
+GET http://localhost:8765/categories/by-name?name=Напитки
+
+###
+POST http://localhost:8765/categories/create
+Authorization: Basic admin admin
+Content-Type: application/json
+
+{
+  "name": "Торты"
+}
+
+###
+POST http://localhost:8765/categories/update
+Authorization: Basic admin admin
+Content-Type: application/json
+
+{
+  "id": 7,
+  "name": "Торты EDITED"
+}
+
+###
+DELETE http://localhost:8765/categories/delete?categoryId=7
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/capacities
+
+###
+GET http://localhost:8765/capacities/by-id?capacityId=1
+
+###
+GET http://localhost:8765/capacities/by-liters?liters=1.5
+
+###
+POST http://localhost:8765/capacities/create
+Authorization: Basic admin admin
+Content-Type: application/json
+
+{
+  "liters": 3.0
+}
+
+###
+POST http://localhost:8765/capacities/update
+Authorization: Basic admin admin
+Content-Type: application/json
+
+{
+  "id": 7,
+  "liters": 3.5
+}
+
+###
+DELETE http://localhost:8765/capacities/delete?capacityId=7
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/sizes
+
+###
+GET http://localhost:8765/sizes/by-id?sizeId=4
+
+###
+GET http://localhost:8765/sizes/by-foodId?foodId=3
+
+###
+POST http://localhost:8765/sizes/create
+Authorization: Basic admin admin
+Content-Type: application/json
+
+{
+  "size": 50
+}
+
+###
+POST http://localhost:8765/sizes/update
+Authorization: Basic admin admin
+Content-Type: application/json
+
+{
+  "id": 5,
+  "size": 60
+}
+
+###
+DELETE http://localhost:8765/sizes/delete?sizeId=5
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/ingredients
+
+###
+GET http://localhost:8765/ingredients/by-foodId?foodId=3
+
+###
+GET http://localhost:8765/ingredients/by-id?ingredientId=3
+
+###
+GET http://localhost:8765/ingredients/by-name?name=Пепперони
+
+###
+POST http://localhost:8765/ingredients/create
+Authorization: Basic admin admin
+Content-Type: application/json
+
+{
+  "name": "Огурцы",
+  "price":60
+}
+
+###
+POST http://localhost:8765/ingredients/update
+Authorization: Basic admin admin
+Content-Type: application/json
+
+{
+  "id": 17,
+  "name": "Огурцы EDITED",
+  "price": 65
+}
+
+###
+DELETE http://localhost:8765/ingredients/delete?ingredientId=17
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/food
+
+###
+GET http://localhost:8765/food/by-id?foodId=3
+
+###
+GET http://localhost:8765/food/by-name?name=Пепперони
+
+###
+POST http://localhost:8765/food/create
+Authorization: Basic admin admin
+Content-Type: application/json
+
+{
+  "categoryId": 1,
+  "name": "Гавайская",
+  "description": "Вкусная гавайская пицца",
+  "sizes": [
+    {"id": 1, "price": 250},
+    {"id": 2, "price": 400},
+    {"id": 3, "price": 650},
+    {"id": 4, "price": 800}
+  ],
+  "ingredients": [
+    4,8,13,14
+  ],
+  "price": 632
+}
+
+###
+POST http://localhost:8765/food/update
+Authorization: Basic admin admin
+Content-Type: application/json
+
+{
+  "id": 23,
+  "name": "Гавайская EDITED",
+  "description": "Вкусная гавайская пицца EDITED",
+  "ingredients": [
+    4,8,13,14,15
+  ],
+  "price": 680
+}
+
+###
+DELETE http://localhost:8765/food/delete?foodId=23
+Authorization: Basic admin admin
+
+###
+GET http://localhost:8765/combos
+
+###
+GET http://localhost:8765/combos/by-id?comboId=1
+
+###
+GET http://localhost:8765/combos/by-name?name=Сет мужественный
+
+###
+POST http://localhost:8765/combos/create
+Authorization: Basic admin admin
+Content-Type: application/json
+
+{
+  "name": "Новое комбо",
+  "description": "Новое описание для нового комбо",
+  "comboFoodExchanges": [
+    {"foodId": 3, "amount": 1},
+    {"foodId": 7, "amount": 2},
+    {"foodId": 9, "amount": 1},
+    {"foodId": 12, "amount": 2}
+  ]
+}
+
+###
+POST http://localhost:8765/choose/create
+Content-Type: application/json
+
+{
+  "foodId": 1,
+  "sizeId": 1,
+  "amount": 1,
+  "food": true,
+  "ingredients": [
+    2,3
+  ]
+}
+
+###
+POST http://localhost:8765/choose/create
+Content-Type: application/json
+Authorization: Basic admin admin
+
+{
+  "commitId": 1,
+  "foodId": 1,
+  "sizeId": 1,
+  "amount": 2,
+  "food": true,
+  "ingredients": [
+    4,5
+  ]
+}
+
+###
+POST http://localhost:8765/choose/create
+Content-Type: application/json
+
+{
+  "commitId": 1,
+  "comboId": 1,
+  "amount": 1,
+  "food": false
+}
+
+###
+POST http://localhost:8765/choose/change-choose-amount?chooseId=1&more=false
+
+###
+GET http://localhost:8765/commits/get-commit
+
+###
+POST http://localhost:8765/commits/close-commit
+
+###
+DELETE http://localhost:8765/commits/delete-commit
+
+###
+GET http://localhost:8765/food/server-events
