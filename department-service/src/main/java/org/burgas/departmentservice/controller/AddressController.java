@@ -6,18 +6,17 @@ import org.burgas.departmentservice.dto.AddressRequest;
 import org.burgas.departmentservice.dto.AddressResponse;
 import org.burgas.departmentservice.handler.IdentityPrincipalHandlerDepartmentService;
 import org.burgas.departmentservice.service.AddressService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
-import static java.net.URI.*;
+import static java.net.URI.create;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.MediaType.*;
+import static org.springframework.http.HttpStatus.FOUND;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Controller
 @RequestMapping("/addresses")
