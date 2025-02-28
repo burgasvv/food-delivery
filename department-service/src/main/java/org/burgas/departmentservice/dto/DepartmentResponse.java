@@ -2,7 +2,7 @@ package org.burgas.departmentservice.dto;
 
 import java.time.LocalTime;
 
-public class DepartmentResponse {
+public final class DepartmentResponse {
 
     private Long id;
     private AddressResponse address;

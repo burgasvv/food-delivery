@@ -1,6 +1,6 @@
 package org.burgas.departmentservice.dto;
 
-public class AddressResponse {
+public final class AddressResponse {
 
     private Long id;
     private String city;

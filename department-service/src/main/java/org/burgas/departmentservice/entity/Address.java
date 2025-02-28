@@ -4,10 +4,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+import java.io.Serializable;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-public class Address {
+public final class Address implements Serializable {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

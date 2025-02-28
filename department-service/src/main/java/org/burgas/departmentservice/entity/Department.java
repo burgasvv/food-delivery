@@ -4,12 +4,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-public class Department {
+public final class Department implements Serializable {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

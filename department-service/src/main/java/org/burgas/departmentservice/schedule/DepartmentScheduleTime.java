@@ -22,7 +22,7 @@ public class DepartmentScheduleTime {
 
     @Scheduled(timeUnit = TimeUnit.SECONDS, fixedRate = 50)
     @Transactional(
-            isolation = Isolation.REPEATABLE_READ,
+            isolation = Isolation.SERIALIZABLE,
             propagation = Propagation.REQUIRED,
             rollbackFor = Exception.class
     )

@@ -6,16 +6,17 @@ import org.burgas.departmentservice.dto.DepartmentRequest;
 import org.burgas.departmentservice.dto.DepartmentResponse;
 import org.burgas.departmentservice.handler.IdentityPrincipalHandlerDepartmentService;
 import org.burgas.departmentservice.service.DepartmentService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
-import static org.springframework.http.HttpHeaders.*;
+import static java.net.URI.create;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.FOUND;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Controller
 @RequestMapping("/departments")
@@ -43,8 +44,8 @@ public class DepartmentController {
     )
     public @ResponseBody ResponseEntity<List<DepartmentResponse>> getDepartmentsAsEvent() {
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
+                .status(OK)
+                .contentType(APPLICATION_JSON)
                 .body(departmentService.findAll());
     }
 
@@ -55,8 +56,8 @@ public class DepartmentController {
     )
     public @ResponseBody ResponseEntity<DepartmentResponse> getDepartmentById(@RequestParam Long departmentId) {
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
+                .status(OK)
+                .contentType(APPLICATION_JSON)
                 .body(departmentService.findById(departmentId));
     }
 
@@ -72,8 +73,8 @@ public class DepartmentController {
                 departmentService.createOrUpdate(departmentRequest), authentication
         );
         return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .location(URI.create("/departments/by-id?departmentId=" + departmentId))
+                .status(FOUND)
+                .location(create("/departments/by-id?departmentId=" + departmentId))
                 .body(departmentId);
     }
 
@@ -89,8 +90,8 @@ public class DepartmentController {
                 departmentService.createOrUpdate(departmentRequest), authentication
         );
         return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .location(URI.create("/departments/by-id?departmentId=" + departmentId))
+                .status(FOUND)
+                .location(create("/departments/by-id?departmentId=" + departmentId))
                 .body(departmentId);
     }
 
@@ -103,7 +104,7 @@ public class DepartmentController {
             @RequestParam Long departmentId, @RequestHeader(AUTHORIZATION) String authentication
     ) {
         return ResponseEntity
-                .status(HttpStatus.OK)
+                .status(OK)
                 .body(
                         identityPrincipalHandlerDepartmentService.handleAdminIdentityPrincipal(
                                 departmentService.deleteById(departmentId), authentication

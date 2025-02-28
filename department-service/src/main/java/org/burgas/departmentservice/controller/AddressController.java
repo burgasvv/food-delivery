@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+import static java.net.URI.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.*;
 
 @Controller
@@ -72,8 +74,8 @@ public class AddressController {
                 addressService.createOrUpdate(addressRequest), authentication
         );
         return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .location(URI.create("/addresses/by-id?addressId=" + addressResponse.getId()))
+                .status(FOUND)
+                .location(create("/addresses/by-id?addressId=" + addressResponse.getId()))
                 .body(addressResponse);
     }
 
@@ -89,8 +91,8 @@ public class AddressController {
                 addressService.createOrUpdate(addressRequest), authentication
         );
         return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .location(URI.create("/addresses/by-id?addressId=" + addressResponse.getId()))
+                .status(FOUND)
+                .location(create("/addresses/by-id?addressId=" + addressResponse.getId()))
                 .body(addressResponse);
     }
 
@@ -103,7 +105,7 @@ public class AddressController {
             @RequestParam Long addressId, @RequestHeader(AUTHORIZATION) String authentication
     ) {
         return ResponseEntity
-                .status(HttpStatus.OK)
+                .status(OK)
                 .body(
                         identityPrincipalHandlerDepartmentService.handleAdminIdentityPrincipal(
                                 addressService.deleteById(addressId), authentication
