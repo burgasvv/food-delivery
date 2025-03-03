@@ -104,6 +104,7 @@ public class FoodShortResponse {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder category(Category category) {
             this.foodShortResponse.category = category;
             return this;
@@ -114,16 +115,19 @@ public class FoodShortResponse {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder description(String description) {
             this.foodShortResponse.description = description;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder capacities(List<Capacity> capacities) {
             this.foodShortResponse.capacities = capacities;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder sizes(List<Size> sizes) {
             this.foodShortResponse.sizes = sizes;
             return this;
@@ -134,6 +138,7 @@ public class FoodShortResponse {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder amount(Long amount) {
             this.foodShortResponse.amount = amount;
             return this;

@@ -77,21 +77,25 @@ public final class DepartmentResponse {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder address(AddressResponse address) {
             this.departmentResponse.address = address;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder opensAt(LocalTime opensAt) {
             this.departmentResponse.opensAt = opensAt;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder closesAt(LocalTime closesAt) {
             this.departmentResponse.closesAt = closesAt;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder opened(Boolean opened) {
             this.departmentResponse.opened = opened;
             return this;

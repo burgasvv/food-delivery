@@ -98,31 +98,37 @@ public class IdentityResponse {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder username(String username) {
             this.identityResponse.username = username;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder password(String password) {
             this.identityResponse.password = password;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder email(String email) {
             this.identityResponse.email = email;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder registeredAt(String registeredAt) {
             this.identityResponse.registeredAt = registeredAt;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder authority(AuthorityResponse authority) {
             this.identityResponse.authority = authority;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder enabled(Boolean enabled) {
             this.identityResponse.enabled = enabled;
             return this;

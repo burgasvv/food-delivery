@@ -115,6 +115,7 @@ public class ComboResponse {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder description(String description) {
             this.comboResponse.description = description;
             return this;
@@ -125,16 +126,19 @@ public class ComboResponse {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder amount(Long amount) {
             this.comboResponse.amount = amount;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder food(List<FoodShortResponse> food) {
             this.comboResponse.food = food;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder mediaId(Long mediaId) {
             this.comboResponse.mediaId = mediaId;
             return this;

@@ -1,7 +1,6 @@
 package org.burgas.foodservice.repository;
 
 import org.burgas.foodservice.entity.Combo;
-import org.burgas.foodservice.dto.Media;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

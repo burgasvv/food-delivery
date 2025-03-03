@@ -68,21 +68,25 @@ public class IdentityPrincipal {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder username(String username) {
             this.identityPrincipal.username = username;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder password(String password) {
             this.identityPrincipal.password = password;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder email(String email) {
             this.identityPrincipal.email = email;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder authority(String authority) {
             this.identityPrincipal.authority = authority;
             return this;

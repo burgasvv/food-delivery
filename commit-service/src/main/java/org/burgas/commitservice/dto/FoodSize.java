@@ -48,11 +48,13 @@ public class FoodSize {
             foodSize = new FoodSize();
         }
 
+        @SuppressWarnings("unused")
         public Builder foodId(Long foodId) {
             this.foodSize.foodId = foodId;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder sizeId(Long sizeId) {
             this.foodSize.sizeId = sizeId;
             return this;

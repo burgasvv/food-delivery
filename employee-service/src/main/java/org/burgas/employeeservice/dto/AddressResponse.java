@@ -76,21 +76,25 @@ public final class AddressResponse {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder city(String city) {
             this.addressResponse.city = city;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder street(String street) {
             this.addressResponse.street = street;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder house(String house) {
             this.addressResponse.house = house;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder apartment(String apartment) {
             this.addressResponse.apartment = apartment;
             return this;

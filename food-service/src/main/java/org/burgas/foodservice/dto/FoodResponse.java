@@ -176,6 +176,7 @@ public class FoodResponse {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder mediaId(Long mediaId) {
             this.foodResponse.mediaId = mediaId;
             return this;

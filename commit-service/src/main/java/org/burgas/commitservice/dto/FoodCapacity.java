@@ -48,11 +48,13 @@ public class FoodCapacity {
             foodCapacity = new FoodCapacity();
         }
 
+        @SuppressWarnings("unused")
         public Builder foodId(Long foodId) {
             this.foodCapacity.foodId = foodId;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder capacityId(Long capacityId) {
             this.foodCapacity.capacityId = capacityId;
             return this;

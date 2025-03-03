@@ -136,6 +136,7 @@ public class FoodResponse {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder category(Category category) {
             this.foodResponse.category = category;
             return this;
@@ -146,21 +147,25 @@ public class FoodResponse {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder description(String description) {
             this.foodResponse.description = description;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder capacities(List<Capacity> capacities) {
             this.foodResponse.capacities = capacities;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder sizes(List<Size> sizes) {
             this.foodResponse.sizes = sizes;
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder ingredients(List<Ingredient> ingredients) {
             this.foodResponse.ingredients = ingredients;
             return this;
@@ -171,6 +176,7 @@ public class FoodResponse {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder mediaId(Long mediaId) {
             this.foodResponse.mediaId = mediaId;
             return this;

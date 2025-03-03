@@ -112,6 +112,7 @@ public class EmployeeResponse {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder mediaId(Long mediaId) {
             this.employeeResponse.mediaId = mediaId;
             return this;
