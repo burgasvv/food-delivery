@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.burgas.employeeservice.dto.EmployeeRequest;
 import org.burgas.employeeservice.dto.EmployeeResponse;
+import org.burgas.employeeservice.exception.WrongMediatypeException;
 import org.burgas.employeeservice.service.EmployeeService;
-import org.burgas.mediaservice.exception.WrongMediatypeException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 
-import static org.burgas.mediaservice.entity.MediaMessage.WRONG_MEDIATYPE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
@@ -143,7 +142,7 @@ public class EmployeeController {
                             )
                     );
         } else
-            throw new WrongMediatypeException(WRONG_MEDIATYPE.getMessage());
+            throw new WrongMediatypeException("В данном случае это неверный тип файла");
     }
 
     @DeleteMapping(value = "/delete-employee-image")

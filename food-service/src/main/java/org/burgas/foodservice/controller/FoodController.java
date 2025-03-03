@@ -1,11 +1,15 @@
 package org.burgas.foodservice.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.burgas.foodservice.dto.FoodRequest;
 import org.burgas.foodservice.dto.FoodResponse;
+import org.burgas.foodservice.entity.FoodCapacity;
+import org.burgas.foodservice.entity.FoodSize;
+import org.burgas.foodservice.repository.FoodCapacityRepository;
+import org.burgas.foodservice.repository.FoodSizeRepository;
 import org.burgas.foodservice.service.FoodService;
-import org.burgas.mediaservice.exception.WrongMediatypeException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,7 +26,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.burgas.mediaservice.entity.MediaMessage.WRONG_MEDIATYPE;
+import static org.burgas.foodservice.dto.MediaMessage.WRONG_MEDIATYPE;
 import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.*;
@@ -36,9 +40,16 @@ import static org.springframework.http.MediaType.*;
 public class FoodController {
 
     private final FoodService foodService;
+    private final FoodCapacityRepository foodCapacityRepository;
+    private final FoodSizeRepository foodSizeRepository;
 
-    public FoodController(FoodService foodService) {
+    public FoodController(
+            FoodService foodService, FoodCapacityRepository foodCapacityRepository,
+            FoodSizeRepository foodSizeRepository
+    ) {
         this.foodService = foodService;
+        this.foodCapacityRepository = foodCapacityRepository;
+        this.foodSizeRepository = foodSizeRepository;
     }
 
     @GetMapping
@@ -174,7 +185,7 @@ public class FoodController {
                             )
                     );
         } else
-            throw new WrongMediatypeException(WRONG_MEDIATYPE.getMessage());
+            throw new RuntimeException(WRONG_MEDIATYPE.getMessage());
     }
 
     @DeleteMapping("/delete-food-image")
@@ -184,5 +195,29 @@ public class FoodController {
                 .status(OK)
                 .contentType(TEXT_PLAIN)
                 .body(foodService.deleteFoodImage(foodId));
+    }
+
+    @Hidden
+    @GetMapping(value = "/food-capacity-ids")
+    public @ResponseBody ResponseEntity<FoodCapacity> getFoodCapacityByIds(
+            @RequestParam Long foodId, @RequestParam Long capacityId
+    ) {
+        return ResponseEntity
+                .ok(foodCapacityRepository
+                                .findFoodCapacityByCapacityIdAndFoodId(capacityId, foodId)
+                                .orElseGet(FoodCapacity::new)
+                );
+    }
+
+    @Hidden
+    @GetMapping(value = "/food-size-ids")
+    public @ResponseBody ResponseEntity<FoodSize> getFoodSizeIds(
+            @RequestParam Long foodId, @RequestParam Long sizeId
+    ) {
+        return ResponseEntity
+                .ok(foodSizeRepository
+                        .findFoodSizeByFoodIdAndSizeId(foodId, sizeId)
+                        .orElseGet(FoodSize::new)
+                );
     }
 }

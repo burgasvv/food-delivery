@@ -2,12 +2,12 @@ package org.burgas.foodservice.service;
 
 import org.burgas.foodservice.dto.ComboRequest;
 import org.burgas.foodservice.dto.ComboResponse;
+import org.burgas.foodservice.dto.Media;
 import org.burgas.foodservice.exception.ComboNotFoundException;
 import org.burgas.foodservice.exception.FoodNotFoundException;
+import org.burgas.foodservice.handler.RestClientHandler;
 import org.burgas.foodservice.mapper.ComboMapper;
 import org.burgas.foodservice.repository.ComboRepository;
-import org.burgas.foodservice.repository.MediaRepositoryFoodRepository;
-import org.burgas.mediaservice.entity.Media;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,15 +29,14 @@ public class ComboService {
     private static final Logger log = LoggerFactory.getLogger(ComboService.class);
     private final ComboRepository comboRepository;
     private final ComboMapper comboMapper;
-    private final MediaRepositoryFoodRepository mediaRepositoryFoodRepository;
+    private final RestClientHandler restClientHandler;
 
     public ComboService(
-            ComboRepository comboRepository, ComboMapper comboMapper,
-            MediaRepositoryFoodRepository mediaRepositoryFoodRepository
+            ComboRepository comboRepository, ComboMapper comboMapper, RestClientHandler restClientHandler
     ) {
         this.comboRepository = comboRepository;
         this.comboMapper = comboMapper;
-        this.mediaRepositoryFoodRepository = mediaRepositoryFoodRepository;
+        this.restClientHandler = restClientHandler;
     }
 
     public List<ComboResponse> findAll() {
@@ -99,26 +98,23 @@ public class ComboService {
                         food -> {
 
                             if (previousMediaId != null) {
-                                Media media = mediaRepositoryFoodRepository.findById(previousMediaId)
-                                        .orElse(null);
+                                Media media = restClientHandler.getMediaById(previousMediaId).getBody();
 
                                 if (media != null && media.getId().equals(food.getMediaId())) {
                                     food.setMediaId(null);
                                     comboRepository.save(food);
-                                    mediaRepositoryFoodRepository.deleteById(previousMediaId);
+                                    comboRepository.deleteMediaInCombo(previousMediaId);
                                     log.info(PREVIEW_COMBO_IMAGE_DELETED.getMessage());
                                 }
                             }
 
                             try {
-                                Media media = mediaRepositoryFoodRepository.save(
-                                        Media.builder()
-                                                .name(multipartFile.getOriginalFilename())
-                                                .contentType(multipartFile.getContentType())
-                                                .data(multipartFile.getBytes())
-                                                .build()
+                                Integer mediaId = comboRepository.insertIntoMediaWithMultipartFile(
+                                        multipartFile.getOriginalFilename(),
+                                        multipartFile.getContentType(),
+                                        multipartFile.getBytes()
                                 );
-                                food.setMediaId(media.getId());
+                                food.setMediaId(Long.valueOf(mediaId));
                                 comboRepository.save(food);
                                 log.info(IMAGE_FOR_COMBO_UPLOADED.getMessage());
 
@@ -140,15 +136,14 @@ public class ComboService {
             propagation = Propagation.REQUIRED,
             rollbackFor = Exception.class
     )
-    public String deleteFoodImage(Long foodId) {
-        return comboRepository.findById(foodId)
+    public String deleteComboImage(Long comboId) {
+        return comboRepository.findById(comboId)
                 .map(
-                        food -> {
-                            Long mediaId = food.getMediaId();
-                            food.setMediaId(null);
-                            comboRepository.save(food);
-
-                            mediaRepositoryFoodRepository.deleteById(mediaId);
+                        combo -> {
+                            Long mediaId = combo.getMediaId();
+                            combo.setMediaId(null);
+                            comboRepository.save(combo);
+                            comboRepository.deleteMediaInCombo(mediaId);
                             return IMAGE_FOR_COMBO_DELETED.getMessage();
                         }
                 )

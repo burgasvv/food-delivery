@@ -3,7 +3,7 @@ package org.burgas.employeeservice.mapper;
 import org.burgas.employeeservice.dto.EmployeeRequest;
 import org.burgas.employeeservice.dto.EmployeeResponse;
 import org.burgas.employeeservice.entity.Employee;
-import org.burgas.employeeservice.handler.RestClientHandlerInEmployeeService;
+import org.burgas.employeeservice.handler.RestClientHandler;
 import org.burgas.employeeservice.repository.EmployeeRepository;
 import org.springframework.stereotype.Component;
 
@@ -11,14 +11,14 @@ import org.springframework.stereotype.Component;
 public class EmployeeMapper {
 
     private final EmployeeRepository employeeRepository;
-    private final RestClientHandlerInEmployeeService restClientHandlerInEmployeeService;
+    private final RestClientHandler restClientHandler;
 
     public EmployeeMapper(
             EmployeeRepository employeeRepository,
-            RestClientHandlerInEmployeeService restClientHandlerInEmployeeService
+            RestClientHandler restClientHandler
     ) {
         this.employeeRepository = employeeRepository;
-        this.restClientHandlerInEmployeeService = restClientHandlerInEmployeeService;
+        this.restClientHandler = restClientHandler;
     }
 
     private <T> T getData(T first, T second) {
@@ -56,12 +56,12 @@ public class EmployeeMapper {
                 .lastname(employee.getLastname())
                 .patronymic(employee.getPatronymic())
                 .department(
-                        restClientHandlerInEmployeeService
+                        restClientHandler
                                 .getDepartmentResponse(employee.getDepartmentId())
                                 .getBody()
                 )
                 .identity(
-                        restClientHandlerInEmployeeService.getIdentityResponse(
+                        restClientHandler.getIdentityResponse(
                                 employee.getIdentityId(), authentication
                         )
                                 .getBody()

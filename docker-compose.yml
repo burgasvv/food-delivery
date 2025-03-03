@@ -9,3 +9,91 @@ services:
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: postgres
       PGDATA: /var/lib/data/postgresql
+
+  commit-service:
+    build:
+      context: commit-service
+      dockerfile: Dockerfile
+    ports:
+      - "9030:9030"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
+
+  database-server:
+    build:
+      context: database-server
+      dockerfile: DockerFile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
+
+  department-service:
+    build:
+      context: department-service
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
+
+  employee-service:
+    build:
+      context: employee-service
+      dockerfile: Dockerfile
+    ports:
+      - "9010:9010"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
+
+  food-service:
+    build:
+      context: food-service
+      dockerfile: Dockerfile
+    ports:
+      - "9020:9020"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
+
+  gateway-server:
+    build:
+      context: gateway-server
+      dockerfile: Dockerfile
+    ports:
+      - "8765:8765"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
+
+  identity-service:
+    build:
+      context: identity-service
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
+
+  media-service:
+    build:
+      context: media-service
+      dockerfile: Dockerfile
+    ports:
+      - "9040:9040"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres

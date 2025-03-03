@@ -4,16 +4,15 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.burgas.commitservice.dto.CommitResponse;
+import org.burgas.commitservice.dto.IdentityPrincipal;
+import org.burgas.commitservice.dto.Token;
 import org.burgas.commitservice.entity.Commit;
 import org.burgas.commitservice.exception.*;
-import org.burgas.commitservice.handler.RestClientHandlerCommitService;
+import org.burgas.commitservice.handler.RestClientHandler;
 import org.burgas.commitservice.mapper.CommitMapper;
 import org.burgas.commitservice.repository.ChooseIngredientRepository;
 import org.burgas.commitservice.repository.ChooseRepository;
 import org.burgas.commitservice.repository.CommitRepository;
-import org.burgas.commitservice.repository.TokenRepositoryCommitRepository;
-import org.burgas.databaseserver.entity.Token;
-import org.burgas.identityservice.dto.IdentityPrincipal;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -31,21 +30,18 @@ public class CommitService {
 
     private final CommitRepository commitRepository;
     private final CommitMapper commitMapper;
-    private final RestClientHandlerCommitService restClientHandlerCommitService;
-    private final TokenRepositoryCommitRepository tokenRepositoryCommitRepository;
+    private final RestClientHandler restClientHandler;
     private final ChooseIngredientRepository chooseIngredientRepository;
     private final ChooseRepository chooseRepository;
 
     public CommitService(
             CommitRepository commitRepository, CommitMapper commitMapper,
-            RestClientHandlerCommitService restClientHandlerCommitService,
-            TokenRepositoryCommitRepository tokenRepositoryCommitRepository,
+            RestClientHandler restClientHandler,
             ChooseIngredientRepository chooseIngredientRepository, ChooseRepository chooseRepository
     ) {
         this.commitRepository = commitRepository;
         this.commitMapper = commitMapper;
-        this.restClientHandlerCommitService = restClientHandlerCommitService;
-        this.tokenRepositoryCommitRepository = tokenRepositoryCommitRepository;
+        this.restClientHandler = restClientHandler;
         this.chooseIngredientRepository = chooseIngredientRepository;
         this.chooseRepository = chooseRepository;
     }
@@ -68,8 +64,8 @@ public class CommitService {
                 .findFirst()
                 .orElse(null);
 
-        IdentityPrincipal identityPrincipal = restClientHandlerCommitService
-                .getIdentityPrincipal(authentication).getBody();
+        IdentityPrincipal identityPrincipal = restClientHandler
+                .getPrincipal(authentication).getBody();
 
         if (commitCookie != null && !Objects.requireNonNull(identityPrincipal).getAuthenticated())
             return getCommitResponseByCookie(commitCookie);
@@ -96,11 +92,11 @@ public class CommitService {
     }
 
     private @NotNull CommitResponse getCommitResponseByCookie(Cookie commitCookie) {
-        Token token = tokenRepositoryCommitRepository
-                .findTokenByValue(commitCookie.getValue())
-                .orElseGet(Token::new);
+        Token token = restClientHandler
+                .getTokenByValue(commitCookie.getValue())
+                .getBody();
 
-        return commitRepository.findCommitByTokenIdAndClosed(token.getId(), false)
+        return commitRepository.findCommitByTokenIdAndClosed(token != null ? token.getId() : null, false)
                 .map(commitMapper::toCommitResponse)
                 .orElseGet(CommitResponse::new);
     }
@@ -118,8 +114,8 @@ public class CommitService {
                 .findFirst()
                 .orElse(null);
 
-        IdentityPrincipal identityPrincipal = restClientHandlerCommitService
-                .getIdentityPrincipal(authentication).getBody();
+        IdentityPrincipal identityPrincipal = restClientHandler
+                .getPrincipal(authentication).getBody();
 
         CommitResponse commitResponse = (CommitResponse) request.getSession().getAttribute("commitCookie");
 
@@ -135,8 +131,8 @@ public class CommitService {
         }
 
         if (commitCookie != null) {
-            Token token = tokenRepositoryCommitRepository.findTokenByValue(commitCookie.getValue())
-                    .orElse(null);
+            Token token = restClientHandler.getTokenByValue(commitCookie.getValue())
+                    .getBody();
 
             if (token != null) {
                 Commit commit = commitRepository.findCommitByTokenId(token.getId())
@@ -190,7 +186,7 @@ public class CommitService {
     )
     public String deleteCommit(HttpServletRequest request, String authentication) {
         CommitResponse commitResponse = (CommitResponse) request.getSession().getAttribute("commitCookie");
-        IdentityPrincipal identityPrincipal = restClientHandlerCommitService.getIdentityPrincipal(authentication).getBody();
+        IdentityPrincipal identityPrincipal = restClientHandler.getPrincipal(authentication).getBody();
 
         if (commitResponse != null && !commitResponse.getClosed())
             return deleteCommitMain(commitResponse, COMMIT_DELETED_BY_SESSION.getMessage());

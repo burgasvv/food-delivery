@@ -4,5 +4,8 @@
     <file url="file://$PROJECT_DIR$/commit-service/src/main/java/org/burgas/commitservice/repository/CommitRepository.java" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/database-server/src/main/resources/database/clean.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/database-server/src/main/resources/database/populate.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/employee-service/src/main/java/org/burgas/employeeservice/repository/EmployeeRepository.java" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/food-service/src/main/java/org/burgas/foodservice/repository/ComboRepository.java" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/food-service/src/main/java/org/burgas/foodservice/repository/FoodRepository.java" dialect="PostgreSQL" />
   </component>
 </project>

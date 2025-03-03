@@ -1,7 +1,5 @@
 package org.burgas.commitservice.dto;
 
-import org.burgas.databaseserver.entity.Token;
-
 import java.util.List;
 
 public class CommitResponse {

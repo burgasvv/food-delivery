@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.burgas.departmentservice.dto.AddressRequest;
 import org.burgas.departmentservice.dto.AddressResponse;
-import org.burgas.departmentservice.handler.IdentityPrincipalHandlerDepartmentService;
+import org.burgas.departmentservice.handler.IdentityPrincipalHandler;
 import org.burgas.departmentservice.service.AddressService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,14 +27,14 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 public class AddressController {
 
     private final AddressService addressService;
-    private final IdentityPrincipalHandlerDepartmentService identityPrincipalHandlerDepartmentService;
+    private final IdentityPrincipalHandler identityPrincipalHandler;
 
     public AddressController(
             AddressService addressService,
-            IdentityPrincipalHandlerDepartmentService identityPrincipalHandlerDepartmentService
+            IdentityPrincipalHandler identityPrincipalHandler
     ) {
         this.addressService = addressService;
-        this.identityPrincipalHandlerDepartmentService = identityPrincipalHandlerDepartmentService;
+        this.identityPrincipalHandler = identityPrincipalHandler;
     }
 
     @GetMapping
@@ -69,7 +69,7 @@ public class AddressController {
     public @ResponseBody ResponseEntity<AddressResponse> createAddress(
             @RequestBody AddressRequest addressRequest, @RequestHeader(AUTHORIZATION) String authentication
     ) {
-        AddressResponse addressResponse = identityPrincipalHandlerDepartmentService.handleAdminIdentityPrincipal(
+        AddressResponse addressResponse = identityPrincipalHandler.handleAdminIdentityPrincipal(
                 addressService.createOrUpdate(addressRequest), authentication
         );
         return ResponseEntity
@@ -86,7 +86,7 @@ public class AddressController {
     public @ResponseBody ResponseEntity<AddressResponse> updateAddress(
             @RequestBody AddressRequest addressRequest, @RequestHeader(AUTHORIZATION) String authentication
     ) {
-        AddressResponse addressResponse = identityPrincipalHandlerDepartmentService.handleAdminIdentityPrincipal(
+        AddressResponse addressResponse = identityPrincipalHandler.handleAdminIdentityPrincipal(
                 addressService.createOrUpdate(addressRequest), authentication
         );
         return ResponseEntity
@@ -106,7 +106,7 @@ public class AddressController {
         return ResponseEntity
                 .status(OK)
                 .body(
-                        identityPrincipalHandlerDepartmentService.handleAdminIdentityPrincipal(
+                        identityPrincipalHandler.handleAdminIdentityPrincipal(
                                 addressService.deleteById(addressId), authentication
                         )
                 );

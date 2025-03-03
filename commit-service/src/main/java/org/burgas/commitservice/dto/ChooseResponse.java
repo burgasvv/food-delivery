@@ -1,10 +1,5 @@
 package org.burgas.commitservice.dto;
 
-import org.burgas.foodservice.entity.Capacity;
-import org.burgas.foodservice.entity.Category;
-import org.burgas.foodservice.entity.Ingredient;
-import org.burgas.foodservice.entity.Size;
-
 import java.util.List;
 
 public class ChooseResponse {

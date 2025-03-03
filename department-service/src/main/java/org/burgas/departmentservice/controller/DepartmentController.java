@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.burgas.departmentservice.dto.DepartmentRequest;
 import org.burgas.departmentservice.dto.DepartmentResponse;
-import org.burgas.departmentservice.handler.IdentityPrincipalHandlerDepartmentService;
+import org.burgas.departmentservice.handler.IdentityPrincipalHandler;
 import org.burgas.departmentservice.service.DepartmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,14 +27,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 public class DepartmentController {
 
     private final DepartmentService departmentService;
-    private final IdentityPrincipalHandlerDepartmentService identityPrincipalHandlerDepartmentService;
+    private final IdentityPrincipalHandler identityPrincipalHandler;
 
     public DepartmentController(
-            DepartmentService departmentService,
-            IdentityPrincipalHandlerDepartmentService identityPrincipalHandlerDepartmentService
+            DepartmentService departmentService, IdentityPrincipalHandler identityPrincipalHandler
     ) {
         this.departmentService = departmentService;
-        this.identityPrincipalHandlerDepartmentService = identityPrincipalHandlerDepartmentService;
+        this.identityPrincipalHandler = identityPrincipalHandler;
     }
 
     @GetMapping
@@ -69,7 +68,7 @@ public class DepartmentController {
     public @ResponseBody ResponseEntity<Long> createDepartment(
             @RequestBody DepartmentRequest departmentRequest, @RequestHeader(AUTHORIZATION) String authentication
     ) {
-        Long departmentId = identityPrincipalHandlerDepartmentService.handleAdminIdentityPrincipal(
+        Long departmentId = identityPrincipalHandler.handleAdminIdentityPrincipal(
                 departmentService.createOrUpdate(departmentRequest), authentication
         );
         return ResponseEntity
@@ -86,7 +85,7 @@ public class DepartmentController {
     public @ResponseBody ResponseEntity<Long> updateDepartment(
             @RequestBody DepartmentRequest departmentRequest, @RequestHeader(AUTHORIZATION) String authentication
     ) {
-        Long departmentId = identityPrincipalHandlerDepartmentService.handleAdminIdentityPrincipal(
+        Long departmentId = identityPrincipalHandler.handleAdminIdentityPrincipal(
                 departmentService.createOrUpdate(departmentRequest), authentication
         );
         return ResponseEntity
@@ -106,7 +105,7 @@ public class DepartmentController {
         return ResponseEntity
                 .status(OK)
                 .body(
-                        identityPrincipalHandlerDepartmentService.handleAdminIdentityPrincipal(
+                        identityPrincipalHandler.handleAdminIdentityPrincipal(
                                 departmentService.deleteById(departmentId), authentication
                         )
                 );

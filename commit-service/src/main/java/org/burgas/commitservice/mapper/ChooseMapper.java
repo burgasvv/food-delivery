@@ -1,18 +1,14 @@
 package org.burgas.commitservice.mapper;
 
 import jakarta.servlet.http.Cookie;
-import org.burgas.commitservice.dto.ChooseRequest;
-import org.burgas.commitservice.dto.ChooseResponse;
+import org.burgas.commitservice.dto.*;
 import org.burgas.commitservice.entity.Choose;
 import org.burgas.commitservice.entity.ChooseIngredient;
 import org.burgas.commitservice.entity.Commit;
-import org.burgas.commitservice.handler.RestClientHandlerCommitService;
-import org.burgas.commitservice.repository.*;
-import org.burgas.databaseserver.entity.Token;
-import org.burgas.foodservice.dto.ComboResponse;
-import org.burgas.foodservice.dto.FoodResponse;
-import org.burgas.foodservice.entity.*;
-import org.burgas.identityservice.dto.IdentityPrincipal;
+import org.burgas.commitservice.handler.RestClientHandler;
+import org.burgas.commitservice.repository.ChooseIngredientRepository;
+import org.burgas.commitservice.repository.ChooseRepository;
+import org.burgas.commitservice.repository.CommitRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -24,40 +20,20 @@ import java.util.Objects;
 public class ChooseMapper {
 
     private final ChooseRepository chooseRepository;
-    private final RestClientHandlerCommitService restClientHandlerCommitService;
-    private final FoodCapacityRepositoryCommitRepository foodCapacityRepositoryCommitRepository;
-    private final FoodSizeRepositoryCommitRepository foodSizeRepositoryCommitRepository;
+    private final RestClientHandler restClientHandler;
     private final ChooseIngredientRepository chooseIngredientRepository;
-    private final IngredientRepositoryCommitRepository ingredientRepositoryCommitRepository;
-    private final SizeRepositoryCommitRepository sizeRepositoryCommitRepository;
-    private final CapacityRepositoryCommitRepository capacityRepositoryCommitRepository;
     private final CommitRepository commitRepository;
-    private final TokenRepositoryCommitRepository tokenRepositoryCommitRepository;
-    private final CategoryRepositoryCommitRepository categoryRepositoryCommitRepository;
 
     public ChooseMapper(
             ChooseRepository chooseRepository,
-            RestClientHandlerCommitService restClientHandlerCommitService,
-            FoodCapacityRepositoryCommitRepository foodCapacityRepositoryCommitRepository,
-            FoodSizeRepositoryCommitRepository foodSizeRepositoryCommitRepository,
+            RestClientHandler restClientHandler,
             ChooseIngredientRepository chooseIngredientRepository,
-            IngredientRepositoryCommitRepository ingredientRepositoryCommitRepository,
-            SizeRepositoryCommitRepository sizeRepositoryCommitRepository,
-            CapacityRepositoryCommitRepository capacityRepositoryCommitRepository, CommitRepository commitRepository,
-            TokenRepositoryCommitRepository tokenRepositoryCommitRepository,
-            CategoryRepositoryCommitRepository categoryRepositoryCommitRepository
+            CommitRepository commitRepository
     ) {
         this.chooseRepository = chooseRepository;
-        this.restClientHandlerCommitService = restClientHandlerCommitService;
-        this.foodCapacityRepositoryCommitRepository = foodCapacityRepositoryCommitRepository;
-        this.foodSizeRepositoryCommitRepository = foodSizeRepositoryCommitRepository;
+        this.restClientHandler = restClientHandler;
         this.chooseIngredientRepository = chooseIngredientRepository;
-        this.ingredientRepositoryCommitRepository = ingredientRepositoryCommitRepository;
-        this.sizeRepositoryCommitRepository = sizeRepositoryCommitRepository;
-        this.capacityRepositoryCommitRepository = capacityRepositoryCommitRepository;
         this.commitRepository = commitRepository;
-        this.tokenRepositoryCommitRepository = tokenRepositoryCommitRepository;
-        this.categoryRepositoryCommitRepository = categoryRepositoryCommitRepository;
     }
 
     private <T> T getData(T first, @SuppressWarnings("SameParameterValue") T second) {
@@ -79,20 +55,20 @@ public class ChooseMapper {
         if (chooseRequest.getFoodId() != null && chooseRequest.getFood()) {
             chooseRequest.setComboId(null);
             id = getData(chooseRequest.getFoodId(), 0L);
-            FoodResponse foodResponse = restClientHandlerCommitService.getFoodById(id).getBody();
+            FoodResponse foodResponse = restClientHandler.getFoodById(id).getBody();
 
             return chooseRepository.findById(chooseId)
                     .map(
                             choose -> {
-                                FoodCapacity capacity = foodCapacityRepositoryCommitRepository.findFoodCapacityByCapacityIdAndFoodId(
+                                FoodCapacity capacity = restClientHandler.getFoodCapacity(
                                         chooseRequest.getCapacityId(), Objects.requireNonNull(foodResponse).getId()
                                 )
-                                        .orElseGet(FoodCapacity::new);
+                                        .getBody();
 
-                                FoodSize foodSize = foodSizeRepositoryCommitRepository.findFoodSizeByFoodIdAndSizeId(
-                                        foodResponse.getId(), chooseRequest.getSizeId()
+                                FoodSize foodSize = restClientHandler.getFoodSize(
+                                        chooseRequest.getSizeId(), foodResponse.getId()
                                 )
-                                        .orElseGet(FoodSize::new);
+                                        .getBody();
 
                                 Commit commit = commitRepository.findById(chooseRequest.getCommitId()).orElseGet(Commit::new);
 
@@ -102,12 +78,13 @@ public class ChooseMapper {
                                         .name(foodResponse.getName())
                                         .mediaId(foodResponse.getMediaId())
                                         .description(foodResponse.getDescription())
-                                        .capacityId(capacity.getCapacityId())
-                                        .sizeId(foodSize.getSizeId())
+                                        .capacityId(capacity != null ? capacity.getCapacityId() : null)
+                                        .sizeId(foodSize != null ? foodSize.getSizeId() : null)
                                         .amount(chooseRequest.getAmount())
                                         .isFood(chooseRequest.getFood())
                                         .price(chooseRequest.getAmount() * (
-                                                foodResponse.getPrice() + getData(foodSize.getPrice(), 0L) + getData(capacity.getPrice(), 0L))
+                                                foodResponse.getPrice() + getData(foodSize != null ? foodSize.getPrice() : null, 0L)
+                                                + getData(capacity != null ? capacity.getPrice() : null, 0L))
                                         )
                                         .build();
 
@@ -123,15 +100,15 @@ public class ChooseMapper {
                     )
                     .orElseGet(
                             () -> {
-                                FoodCapacity capacity = foodCapacityRepositoryCommitRepository.findFoodCapacityByCapacityIdAndFoodId(
-                                        chooseRequest.getCapacityId(), Objects.requireNonNull(foodResponse).getId()
-                                )
-                                        .orElseGet(FoodCapacity::new);
+                                FoodCapacity capacity = restClientHandler.getFoodCapacity(
+                                                chooseRequest.getCapacityId(), Objects.requireNonNull(foodResponse).getId()
+                                        )
+                                        .getBody();
 
-                                FoodSize foodSize = foodSizeRepositoryCommitRepository.findFoodSizeByFoodIdAndSizeId(
-                                        foodResponse.getId(), chooseRequest.getSizeId()
-                                )
-                                        .orElseGet(FoodSize::new);
+                                FoodSize foodSize = restClientHandler.getFoodSize(
+                                                chooseRequest.getSizeId(), foodResponse.getId()
+                                        )
+                                        .getBody();
 
                                 if (chooseRequest.getCommitId() != null) {
 
@@ -141,12 +118,13 @@ public class ChooseMapper {
                                             .name(foodResponse.getName())
                                             .description(foodResponse.getDescription())
                                             .mediaId(foodResponse.getMediaId())
-                                            .capacityId(capacity.getCapacityId())
-                                            .sizeId(foodSize.getSizeId())
+                                            .capacityId(capacity != null ? capacity.getCapacityId() : null)
+                                            .sizeId(foodSize != null ? foodSize.getSizeId() : null)
                                             .isFood(chooseRequest.getFood())
                                             .amount(chooseRequest.getAmount())
                                             .price(chooseRequest.getAmount() *
-                                                   (foodResponse.getPrice() + getData(capacity.getPrice(), 0L) + getData(capacity.getPrice(), 0L))
+                                                   (foodResponse.getPrice() + getData(capacity != null ? capacity.getPrice() : null, 0L)
+                                                    + getData(capacity != null ? capacity.getPrice() : null, 0L))
                                             )
                                             .build();
 
@@ -171,9 +149,9 @@ public class ChooseMapper {
 
                                             chooseIngredients.forEach(
                                                     chooseIngredient -> {
-                                                        Ingredient ingredient = ingredientRepositoryCommitRepository
-                                                                .findById(chooseIngredient.getIngredientId())
-                                                                .orElseGet(Ingredient::new);
+                                                        Ingredient ingredient = restClientHandler
+                                                                .getIngredientById(chooseIngredient.getIngredientId())
+                                                                        .getBody();
 
                                                         ingredients.add(ingredient);
                                                     }
@@ -203,12 +181,13 @@ public class ChooseMapper {
                                             .name(foodResponse.getName())
                                             .description(foodResponse.getDescription())
                                             .mediaId(foodResponse.getMediaId())
-                                            .capacityId(capacity.getCapacityId())
-                                            .sizeId(foodSize.getSizeId())
+                                            .capacityId(capacity != null ? capacity.getCapacityId() : null)
+                                            .sizeId(foodSize != null ? foodSize.getSizeId() : null)
                                             .amount(chooseRequest.getAmount())
                                             .isFood(chooseRequest.getFood())
                                             .price(chooseRequest.getAmount() *
-                                                   (foodResponse.getPrice() + getData(foodSize.getPrice(), 0L) + getData(capacity.getPrice(), 0L))
+                                                   (foodResponse.getPrice() + getData(foodSize != null ? foodSize.getPrice() : null, 0L)
+                                                    + getData(capacity != null ? capacity.getPrice() : null, 0L))
                                             )
                                             .build();
 
@@ -225,7 +204,7 @@ public class ChooseMapper {
         if (chooseRequest.getComboId() != null && !chooseRequest.getFood()) {
             chooseRequest.setFoodId(null);
             id = getData(chooseRequest.getComboId(), 0L);
-            ComboResponse comboResponse = restClientHandlerCommitService.getComboById(id).getBody();
+            ComboResponse comboResponse = restClientHandler.getComboById(id).getBody();
 
             return chooseRepository.findById(chooseId)
                     .map(
@@ -308,12 +287,12 @@ public class ChooseMapper {
 
         if (commit != null && !commit.getClosed()) {
 
-            IdentityPrincipal identityPrincipal = restClientHandlerCommitService
-                    .getIdentityPrincipal(authentication).getBody();
+            IdentityPrincipal identityPrincipal = restClientHandler
+                    .getPrincipal(authentication).getBody();
 
-            if (Objects.requireNonNull(identityPrincipal).getAuthenticated()) {
+            //noinspection DataFlowIssue
+            if (identityPrincipal.getAuthenticated())
                 commit.setIdentityId(identityPrincipal.getId());
-            }
 
             choose.setCommitId(commit.getId());
             chooseRepository.save(choose);
@@ -338,22 +317,15 @@ public class ChooseMapper {
                     .price(choose.getPrice())
                     .build();
 
-            IdentityPrincipal identityPrincipal = restClientHandlerCommitService
-                    .getIdentityPrincipal(authentication).getBody();
+            IdentityPrincipal identityPrincipal = restClientHandler
+                    .getPrincipal(authentication).getBody();
 
-            if (Objects.requireNonNull(identityPrincipal).getAuthenticated()) {
+            //noinspection DataFlowIssue
+            if (identityPrincipal.getAuthenticated())
                 commit.setIdentityId(identityPrincipal.getId());
-                Token token = tokenRepositoryCommitRepository.save(
-                        Token.builder().name(cookie.getName()).value(cookie.getValue()).build()
-                );
-                commit.setTokenId(token.getId());
 
-            } else {
-                Token token = tokenRepositoryCommitRepository.save(
-                        Token.builder().name(cookie.getName()).value(cookie.getValue()).build()
-                );
-                commit.setTokenId(token.getId());
-            }
+            Integer tokenId = commitRepository.insertIntoTokenFromCommit(cookie.getName(), cookie.getValue());
+            commit.setTokenId(Long.valueOf(tokenId));
 
             Commit saved = commitRepository.save(commit);
             choose.setCommitId(saved.getId());
@@ -371,8 +343,8 @@ public class ChooseMapper {
                                     .ingredientId(aLong)
                                     .build()
                     );
-                    Ingredient ingredient = ingredientRepositoryCommitRepository.findById(aLong)
-                            .orElseGet(Ingredient::new);
+                    Ingredient ingredient = restClientHandler.getIngredientById(aLong)
+                                    .getBody();
                     ingredients.add(ingredient);
                 }
         );
@@ -396,22 +368,22 @@ public class ChooseMapper {
 
         if (choose.getFood()) {
             List<ChooseIngredient> chooseIngredients = chooseIngredientRepository.findChooseIngredientsByChooseId(choose.getId());
-            FoodResponse foodResponse = restClientHandlerCommitService.getFoodByName(choose.getName()).getBody();
+            FoodResponse foodResponse = restClientHandler.getFoodByName(choose.getName()).getBody();
             List<Ingredient> ingredients = new ArrayList<>();
             chooseIngredients.forEach(
                     chooseIngredient -> {
-                        Ingredient ingredient = ingredientRepositoryCommitRepository
-                                .findById(chooseIngredient.getIngredientId()).orElseGet(Ingredient::new);
+                        Ingredient ingredient = restClientHandler
+                                .getIngredientById(chooseIngredient.getIngredientId()).getBody();
                         ingredients.add(ingredient);
                     }
             );
             return ChooseResponse.builder()
                     .id(choose.getId())
-                    .category(Objects.requireNonNull(foodResponse).getCategory())
+                    .category(foodResponse != null ? foodResponse.getCategory() : null)
                     .name(choose.getName())
                     .description(choose.getDescription())
-                    .size(sizeRepositoryCommitRepository.findById(choose.getSizeId()).orElseGet(Size::new))
-                    .capacity(capacityRepositoryCommitRepository.findById(choose.getCapacityId()).orElseGet(Capacity::new))
+                    .size(restClientHandler.getSizeById(choose.getSizeId()).getBody())
+                    .capacity(restClientHandler.getCapacityById(choose.getCapacityId()).getBody())
                     .price(choose.getPrice())
                     .amount(choose.getAmount())
                     .isFood(choose.getFood())
@@ -424,7 +396,7 @@ public class ChooseMapper {
 
             return ChooseResponse.builder()
                     .id(choose.getId())
-                    .category(categoryRepositoryCommitRepository.findById(choose.getCategoryId()).orElseGet(Category::new))
+                    .category(restClientHandler.getCategoryById(choose.getCategoryId()).getBody())
                     .name(choose.getName())
                     .description(choose.getDescription())
                     .price(choose.getPrice())

@@ -131,6 +131,7 @@ public class Employee {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder mediaId(Long mediaId) {
             this.employee.mediaId = mediaId;
             return this;

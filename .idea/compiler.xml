@@ -25,9 +25,9 @@
         </processorPath>
         <module name="database-server" />
         <module name="gateway-server" />
+        <module name="identity-service" />
         <module name="commit-service" />
         <module name="department-service" />
-        <module name="identity-service" />
       </profile>
       <profile name="Annotation profile for food-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />

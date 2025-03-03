@@ -32,6 +32,7 @@ public class FoodResponse {
         return category;
     }
 
+    @SuppressWarnings("unused")
     public void setCategory() {
         setCategory(null);
     }

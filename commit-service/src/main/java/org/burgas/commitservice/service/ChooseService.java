@@ -5,18 +5,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.burgas.commitservice.dto.ChooseRequest;
 import org.burgas.commitservice.dto.ChooseResponse;
 import org.burgas.commitservice.dto.CommitResponse;
+import org.burgas.commitservice.dto.Token;
 import org.burgas.commitservice.entity.Choose;
 import org.burgas.commitservice.entity.Commit;
 import org.burgas.commitservice.exception.ChooseNotFoundException;
 import org.burgas.commitservice.exception.CommitNotFoundException;
 import org.burgas.commitservice.exception.CookieNotFoundException;
 import org.burgas.commitservice.exception.TokenNotFoundException;
+import org.burgas.commitservice.handler.RestClientHandler;
 import org.burgas.commitservice.mapper.ChooseMapper;
 import org.burgas.commitservice.mapper.CommitMapper;
 import org.burgas.commitservice.repository.ChooseRepository;
 import org.burgas.commitservice.repository.CommitRepository;
-import org.burgas.commitservice.repository.TokenRepositoryCommitRepository;
-import org.burgas.databaseserver.entity.Token;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -35,19 +35,19 @@ public class ChooseService {
     private final ChooseRepository chooseRepository;
     private final ChooseMapper chooseMapper;
     private final CommitRepository commitRepository;
-    private final TokenRepositoryCommitRepository tokenRepositoryCommitRepository;
     private final CommitMapper commitMapper;
+    private final RestClientHandler restClientHandler;
 
     public ChooseService(
             ChooseRepository chooseRepository,
             ChooseMapper chooseMapper, CommitRepository commitRepository,
-            TokenRepositoryCommitRepository tokenRepositoryCommitRepository, CommitMapper commitMapper
+            CommitMapper commitMapper, RestClientHandler restClientHandler
     ) {
         this.chooseRepository = chooseRepository;
         this.chooseMapper = chooseMapper;
         this.commitRepository = commitRepository;
-        this.tokenRepositoryCommitRepository = tokenRepositoryCommitRepository;
         this.commitMapper = commitMapper;
+        this.restClientHandler = restClientHandler;
     }
 
     public ChooseResponse findById(Long chooseId) {
@@ -81,18 +81,18 @@ public class ChooseService {
         CommitResponse sessionCommit = (CommitResponse) request.getSession().getAttribute("commitCookie");
         if (sessionCommit != null && !sessionCommit.getClosed()) {
             Choose choose = chooseRepository.findById(chooseId).orElse(null);
-            Token token = tokenRepositoryCommitRepository
-                    .findTokenByValue(sessionCommit.getToken().getValue())
-                    .orElse(null);
+            Token token = restClientHandler
+                    .getTokenByValue(sessionCommit.getToken().getValue())
+                    .getBody();
 
             return changeChooseMain(more, choose, token, request);
         }
 
         if (commitCookie != null) {
             Choose choose = chooseRepository.findById(chooseId).orElse(null);
-            Token token = tokenRepositoryCommitRepository
-                    .findTokenByValue(commitCookie.getValue())
-                    .orElse(null);
+            Token token = restClientHandler
+                    .getTokenByValue(sessionCommit != null ? sessionCommit.getToken().getValue() : null)
+                    .getBody();
 
             return changeChooseMain(more, choose, token, request);
 

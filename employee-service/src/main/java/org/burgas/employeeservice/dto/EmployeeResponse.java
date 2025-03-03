@@ -1,8 +1,5 @@
 package org.burgas.employeeservice.dto;
 
-import org.burgas.departmentservice.dto.DepartmentResponse;
-import org.burgas.identityservice.dto.IdentityResponse;
-
 public class EmployeeResponse {
 
     private Long id;

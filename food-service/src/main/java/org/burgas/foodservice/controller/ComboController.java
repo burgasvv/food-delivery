@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.burgas.foodservice.dto.ComboRequest;
 import org.burgas.foodservice.dto.ComboResponse;
 import org.burgas.foodservice.service.ComboService;
-import org.burgas.mediaservice.exception.WrongMediatypeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 
-import static org.burgas.mediaservice.entity.MediaMessage.WRONG_MEDIATYPE;
+import static org.burgas.foodservice.dto.MediaMessage.WRONG_MEDIATYPE;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.*;
 
@@ -132,7 +131,7 @@ public class ComboController {
                             )
                     );
         } else
-            throw new WrongMediatypeException(WRONG_MEDIATYPE.getMessage());
+            throw new RuntimeException(WRONG_MEDIATYPE.getMessage());
     }
 
     @DeleteMapping("/delete-combo-image")
@@ -141,6 +140,6 @@ public class ComboController {
         return ResponseEntity
                 .status(OK)
                 .contentType(TEXT_PLAIN)
-                .body(comboService.deleteFoodImage(comboId));
+                .body(comboService.deleteComboImage(comboId));
     }
 }

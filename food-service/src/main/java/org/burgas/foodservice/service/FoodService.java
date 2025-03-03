@@ -2,11 +2,11 @@ package org.burgas.foodservice.service;
 
 import org.burgas.foodservice.dto.FoodRequest;
 import org.burgas.foodservice.dto.FoodResponse;
+import org.burgas.foodservice.dto.Media;
 import org.burgas.foodservice.exception.FoodNotFoundException;
+import org.burgas.foodservice.handler.RestClientHandler;
 import org.burgas.foodservice.mapper.FoodMapper;
 import org.burgas.foodservice.repository.FoodRepository;
-import org.burgas.foodservice.repository.MediaRepositoryFoodRepository;
-import org.burgas.mediaservice.entity.Media;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,15 +27,14 @@ public class FoodService {
     private static final Logger log = LoggerFactory.getLogger(FoodService.class);
     private final FoodRepository foodRepository;
     private final FoodMapper foodMapper;
-    private final MediaRepositoryFoodRepository mediaRepositoryFoodRepository;
+    private final RestClientHandler restClientHandler;
 
     public FoodService(
-            FoodRepository foodRepository, FoodMapper foodMapper,
-            MediaRepositoryFoodRepository mediaRepositoryFoodRepository
+            FoodRepository foodRepository, FoodMapper foodMapper, RestClientHandler restClientHandler
     ) {
         this.foodRepository = foodRepository;
         this.foodMapper = foodMapper;
-        this.mediaRepositoryFoodRepository = mediaRepositoryFoodRepository;
+        this.restClientHandler = restClientHandler;
     }
 
     public List<FoodResponse> findAll() {
@@ -96,26 +95,23 @@ public class FoodService {
                         food -> {
 
                             if (previousMediaId != null) {
-                                Media media = mediaRepositoryFoodRepository.findById(previousMediaId)
-                                        .orElse(null);
+                                Media media = restClientHandler.getMediaById(previousMediaId).getBody();
 
                                 if (media != null && media.getId().equals(food.getMediaId())) {
                                     food.setMediaId(null);
                                     foodRepository.save(food);
-                                    mediaRepositoryFoodRepository.deleteById(previousMediaId);
+                                    foodRepository.deleteMediaInFood(previousMediaId);
                                     log.info(PREVIEW_FOOD_IMAGE_DELETED.getMessage());
                                 }
                             }
 
                             try {
-                                Media media = mediaRepositoryFoodRepository.save(
-                                        Media.builder()
-                                                .name(multipartFile.getOriginalFilename())
-                                                .contentType(multipartFile.getContentType())
-                                                .data(multipartFile.getBytes())
-                                                .build()
+                                Integer mediaId = foodRepository.insertIntoMediaWithMultipartFile(
+                                        multipartFile.getOriginalFilename(),
+                                        multipartFile.getContentType(),
+                                        multipartFile.getBytes()
                                 );
-                                food.setMediaId(media.getId());
+                                food.setMediaId(Long.valueOf(mediaId));
                                 foodRepository.save(food);
 
                                 return IMAGE_FOR_FOOD_UPLOADED.getMessage();
@@ -143,8 +139,7 @@ public class FoodService {
                             Long mediaId = food.getMediaId();
                             food.setMediaId(null);
                             foodRepository.save(food);
-
-                            mediaRepositoryFoodRepository.deleteById(mediaId);
+                            foodRepository.deleteMediaInFood(mediaId);
                             return IMAGE_FOR_FOOD_DELETED.getMessage();
                         }
                 )

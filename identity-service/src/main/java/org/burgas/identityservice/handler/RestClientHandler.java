@@ -18,10 +18,6 @@ public class RestClientHandler {
         this.restClient = restClient;
     }
 
-    protected RestClient getRestClient() {
-        return restClient;
-    }
-
     @CircuitBreaker(name = "getIdentityPrincipal", fallbackMethod = "fallBackGetIdentityPrincipal")
     public ResponseEntity<IdentityPrincipal> getIdentityPrincipal(String authentication) {
         return restClient.get()

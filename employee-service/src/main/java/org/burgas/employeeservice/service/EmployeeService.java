@@ -2,16 +2,15 @@ package org.burgas.employeeservice.service;
 
 import org.burgas.employeeservice.dto.EmployeeRequest;
 import org.burgas.employeeservice.dto.EmployeeResponse;
+import org.burgas.employeeservice.dto.IdentityPrincipal;
+import org.burgas.employeeservice.dto.Media;
 import org.burgas.employeeservice.entity.Employee;
 import org.burgas.employeeservice.exception.EmployeeNotFoundException;
 import org.burgas.employeeservice.exception.MediaNotFoundException;
-import org.burgas.employeeservice.handler.RestClientHandlerInEmployeeService;
+import org.burgas.employeeservice.exception.NotAuthorizedException;
+import org.burgas.employeeservice.handler.RestClientHandler;
 import org.burgas.employeeservice.mapper.EmployeeMapper;
 import org.burgas.employeeservice.repository.EmployeeRepository;
-import org.burgas.employeeservice.repository.MediaRepositoryEmployeeRepository;
-import org.burgas.identityservice.dto.IdentityPrincipal;
-import org.burgas.identityservice.exception.NotAuthorizedException;
-import org.burgas.mediaservice.entity.Media;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -24,7 +23,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.burgas.employeeservice.entity.EmployeeMessage.*;
-import static org.burgas.mediaservice.entity.MediaMessage.MEDIA_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -32,18 +30,15 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final EmployeeMapper employeeMapper;
-    private final RestClientHandlerInEmployeeService restClientHandlerInEmployeeService;
-    private final MediaRepositoryEmployeeRepository mediaRepositoryEmployeeRepository;
+    private final RestClientHandler restClientHandler;
 
     public EmployeeService(
             EmployeeRepository employeeRepository, EmployeeMapper employeeMapper,
-            RestClientHandlerInEmployeeService restClientHandlerInEmployeeService,
-            MediaRepositoryEmployeeRepository mediaRepositoryEmployeeRepository
+            RestClientHandler restClientHandler
     ) {
         this.employeeRepository = employeeRepository;
         this.employeeMapper = employeeMapper;
-        this.restClientHandlerInEmployeeService = restClientHandlerInEmployeeService;
-        this.mediaRepositoryEmployeeRepository = mediaRepositoryEmployeeRepository;
+        this.restClientHandler = restClientHandler;
     }
 
     public List<EmployeeResponse> findAll(String authentication) {
@@ -75,7 +70,7 @@ public class EmployeeService {
         if (employeeRequest.identityId() == null) {
             throw new RuntimeException(NO_IDENTITY_ID.getMessage());
         }
-        return Optional.ofNullable(restClientHandlerInEmployeeService.getIdentityPrincipal(authentication).getBody())
+        return Optional.ofNullable(restClientHandler.getIdentityPrincipal(authentication).getBody())
                 .filter(
                         identityPrincipal -> Objects.requireNonNull(identityPrincipal).getAuthenticated() &&
                                              identityPrincipal.getId().equals(employeeRequest.identityId())
@@ -93,7 +88,7 @@ public class EmployeeService {
     )
     public String deleteById(Long employeeId, String authentication) {
         Long identityId = employeeRepository.findIdentityIdByEmployeeId(employeeId);
-        return Optional.ofNullable(restClientHandlerInEmployeeService.getIdentityPrincipal(authentication).getBody())
+        return Optional.ofNullable(restClientHandler.getIdentityPrincipal(authentication).getBody())
                 .filter(
                         identityPrincipal -> Objects.requireNonNull(identityPrincipal).getAuthenticated() &&
                                              identityPrincipal.getId().equals(identityId)
@@ -118,7 +113,7 @@ public class EmployeeService {
     )
     public String uploadEmployeeImage(Long employeeId, Long previousMediaId, MultipartFile multipartFile, String authentication) {
         Long identityId = employeeRepository.findIdentityIdByEmployeeId(employeeId);
-        IdentityPrincipal idp = restClientHandlerInEmployeeService.getIdentityPrincipal(authentication).getBody();
+        IdentityPrincipal idp = restClientHandler.getIdentityPrincipal(authentication).getBody();
 
         return Optional.ofNullable(idp)
                 .filter(
@@ -132,33 +127,31 @@ public class EmployeeService {
                             try {
                                 Employee employee = employeeRepository.findEmployeeByMediaId(previousMediaId);
                                 if (employee != null && employee.getId().equals(employeeId)) {
-                                    Media media = mediaRepositoryEmployeeRepository.findById(previousMediaId)
-                                            .orElse(null);
+                                    Media media = restClientHandler.getMediaById(previousMediaId).getBody();
 
                                     if (media != null)
-                                        mediaRepositoryEmployeeRepository.deleteById(media.getId());
+                                        employeeRepository.deleteMediaByIdFromEmployee(media.getId());
                                     else
-                                        throw new MediaNotFoundException(MEDIA_NOT_FOUND.getMessage());
+                                        throw new MediaNotFoundException("Медиа файл не найден");
                                 }
-                                return mediaRepositoryEmployeeRepository
-                                        .save(
-                                                Media.builder()
-                                                        .name(multipartFile.getOriginalFilename())
-                                                        .contentType(multipartFile.getContentType())
-                                                        .data(multipartFile.getBytes())
-                                                        .build()
+                                return employeeRepository
+                                        .insertIntoMediaFromEmployee(
+                                                multipartFile.getOriginalFilename(),
+                                                multipartFile.getContentType(),
+                                                multipartFile.getBytes()
                                         );
+
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
                         }
                 )
                 .map(
-                        media -> {
+                        mediaId -> {
                             Employee employee = employeeRepository.findById(employeeId).orElse(null);
 
                             if (employee != null) {
-                                employee.setMediaId(media.getId());
+                                employee.setMediaId(Long.valueOf(mediaId));
                                 employeeRepository.save(employee);
 
                                 return EMPLOYEE_IMAGE_SAVED.getMessage();
@@ -179,7 +172,7 @@ public class EmployeeService {
     )
     public String deleteEmployeeImage(Long employeeId, String authentication) {
         Long identityId = employeeRepository.findIdentityIdByEmployeeId(employeeId);
-        IdentityPrincipal idp = restClientHandlerInEmployeeService.getIdentityPrincipal(authentication).getBody();
+        IdentityPrincipal idp = restClientHandler.getIdentityPrincipal(authentication).getBody();
 
         return Optional.ofNullable(idp)
                 .filter(
@@ -194,7 +187,7 @@ public class EmployeeService {
                             Long mediaId = employee.getMediaId();
                             employee.setMediaId(null);
                             employeeRepository.save(employee);
-                            mediaRepositoryEmployeeRepository.deleteById(mediaId);
+                            employeeRepository.deleteMediaByIdFromEmployee(mediaId);
                             return EMPLOYEE_IMAGE_DELETED.getMessage();
                         }
                 )

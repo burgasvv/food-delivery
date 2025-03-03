@@ -11,6 +11,7 @@ import static org.springframework.cloud.gateway.server.mvc.handler.HandlerFuncti
 @Configuration
 public class ProxyConfig {
 
+    public static final String DATABASE_SERVICE_URL = "http://localhost:8080";
     public static final String IDENTITY_SERVICE_URL = "http://localhost:8888";
     public static final String DEPARTMENT_SERVICE_URL = "http://localhost:9000";
     public static final String EMPLOYEE_SERVICE_URL = "http://localhost:9010";
@@ -21,6 +22,9 @@ public class ProxyConfig {
     @Bean
     public RouterFunction<ServerResponse> gatewayProxyRoutes() {
         return RouterFunctions.route()
+
+                .GET("/tokens/**", http(DATABASE_SERVICE_URL))
+                .POST("/tokens/**", http(DATABASE_SERVICE_URL))
 
                 .GET("/authorities/**", http(IDENTITY_SERVICE_URL))
                 .POST("/authorities/**", http(IDENTITY_SERVICE_URL))

@@ -90,7 +90,7 @@ public class SecurityConfig {
                                         "/combos","/combos/by-id","/combos/by-name",
                                         "/choose/by-id","/choose/create","/choose/update","/choose/change-choose-amount",
                                         "/commits/get-commit","/commits/close-commit","/commits/delete-commit",
-                                        "/media/by-id"
+                                        "/media/by-id","/tokens/**"
                                 )
                                 .permitAll()
 
