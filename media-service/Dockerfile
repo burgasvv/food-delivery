@@ -1,4 +1,4 @@
-FROM openjdk
+FROM bellsoft/liberica-openjdk-alpine
 LABEL authors="Burgas"
 
 COPY target/media-service-1.0.0.jar media-service.jar

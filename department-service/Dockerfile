@@ -1,4 +1,4 @@
-FROM openjdk
+FROM bellsoft/liberica-openjdk-alpine
 LABEL authors="Burgas"
 
 COPY target/department-service-1.0.0.jar department-service.jar

@@ -1,4 +1,4 @@
-FROM openjdk
+FROM bellsoft/liberica-openjdk-alpine
 LABEL authors="Burgas"
 
 COPY target/identity-service-1.0.0.jar identity-service.jar

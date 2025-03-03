@@ -1,4 +1,4 @@
-FROM openjdk
+FROM employee-service.jar
 LABEL authors="Burgas"
 
 COPY target/food-service-1.0.0.jar food-service.jar
