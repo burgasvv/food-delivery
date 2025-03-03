@@ -75,6 +75,7 @@ public class Media {
             return this;
         }
 
+        @SuppressWarnings("unused")
         public Builder contentType(String contentType) {
             this.media.contentType = contentType;
             return this;
