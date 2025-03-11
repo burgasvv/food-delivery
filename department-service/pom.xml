@@ -29,6 +29,7 @@
     <properties>
         <java.version>23</java.version>
         <spring-cloud.version>2024.0.0</spring-cloud.version>
+<!--        <spring-boot.repackage.skip>true</spring-boot.repackage.skip>-->
     </properties>
     <dependencyManagement>
         <dependencies>
