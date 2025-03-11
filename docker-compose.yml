@@ -10,6 +10,17 @@ services:
       POSTGRES_PASSWORD: postgres
       PGDATA: /var/lib/data/postgresql
 
+  database-server:
+    build:
+      context: database-server
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
+
   commit-service:
     build:
       context: commit-service
@@ -18,17 +29,7 @@ services:
       - "9030:9030"
     depends_on:
       - postgres
-    environment:
-      SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
-
-  database-server:
-    build:
-      context: database-server
-      dockerfile: DockerFile
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
+      - database-server
     environment:
       SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
 
@@ -40,6 +41,8 @@ services:
       - "9000:9000"
     depends_on:
       - postgres
+      - database-server
+      - commit-service
     environment:
       SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
 
@@ -51,6 +54,9 @@ services:
       - "9010:9010"
     depends_on:
       - postgres
+      - database-server
+      - commit-service
+      - department-service
     environment:
       SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
 
@@ -62,17 +68,10 @@ services:
       - "9020:9020"
     depends_on:
       - postgres
-    environment:
-      SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
-
-  gateway-server:
-    build:
-      context: gateway-server
-      dockerfile: Dockerfile
-    ports:
-      - "8765:8765"
-    depends_on:
-      - postgres
+      - database-server
+      - commit-service
+      - department-service
+      - employee-service
     environment:
       SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
 
@@ -84,6 +83,11 @@ services:
       - "8888:8888"
     depends_on:
       - postgres
+      - database-server
+      - commit-service
+      - department-service
+      - employee-service
+      - food-service
     environment:
       SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
 
@@ -95,5 +99,29 @@ services:
       - "9040:9040"
     depends_on:
       - postgres
+      - database-server
+      - commit-service
+      - department-service
+      - employee-service
+      - food-service
+      - identity-service
+    environment:
+      SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
+
+  gateway-server:
+    build:
+      context: gateway-server
+      dockerfile: Dockerfile
+    ports:
+      - "8765:8765"
+    depends_on:
+      - postgres
+      - database-server
+      - commit-service
+      - department-service
+      - employee-service
+      - food-service
+      - identity-service
+      - media-service
     environment:
       SPRING_DATASOURCE-URL: jdbc:postgresql://localhost:5432/postgres
