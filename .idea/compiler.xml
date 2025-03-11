@@ -45,11 +45,11 @@
           <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/3.4.2/spring-boot-configuration-processor-3.4.2.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/3.4.2/spring-boot-configuration-processor-3.4.2.jar" />
         </processorPath>
-        <module name="database-server" />
         <module name="gateway-server" />
-        <module name="commit-service" />
+        <module name="database-server" />
         <module name="department-service" />
         <module name="identity-service" />
+        <module name="commit-service" />
       </profile>
     </annotationProcessing>
   </component>
