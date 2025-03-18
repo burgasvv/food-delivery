@@ -7,7 +7,8 @@ import jakarta.persistence.Id;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-public class Token {
+@SuppressWarnings("unused")
+public final class Token {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -27,17 +28,14 @@ public class Token {
         return name;
     }
 
-    @SuppressWarnings("unused")
     public void setName(String name) {
         this.name = name;
     }
 
-    @SuppressWarnings("unused")
     public String getValue() {
         return value;
     }
 
-    @SuppressWarnings("unused")
     public void setValue(String value) {
         this.value = value;
     }
